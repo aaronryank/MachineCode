@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+
+local $/ = undef;
+open FILE, $ARGV[0] or die "Couldn't open file: $!";
+binmode FILE;
+my $str = <FILE>;
+close FILE;
+
+my $func = 96;
+my $code = 0;
+
+#$str =~ s{>\K(.*?)(?=\n)}{$1 =~ s/..\K(?=.)/ /sgr}esg;
+
+my @lines = split /\n/, $str;
+foreach my $line (@lines) {
+    if ($line =~ /^[\&]/) {
+        $func++;
+        $line =~ s/^[\&]//;
+        $line =~ s/..\K(?=.)/\\x/sg;
+        substr($line, 0, 0, 'int (*' . chr($func) . ')() = "\x');
+        $line .= '";';
+    } else {
+        $code++;
+        substr($line, 0, 0, 'int main(int C, char *A[]) { ');
+        $line .= ' }';
+    }
+}
+
+print "enum { NONE, PTR__, INT__, CHR__, STR__, EXT__ };\n";
+print "const int OUTPUT = ";
+
+if (!length($ARGV[2] // '')) {
+    print "NONE;\n";
+} elsif ($ARGV[2] eq 'p') {
+    print "PTR__;\n";
+} elsif ($ARGV[2] eq 'i') {
+    print "INT__;\n";
+} elsif ($ARGV[2] eq 'c') {
+    print "CHR__;\n";
+} elsif ($ARGV[2] eq 's') {
+    print "STR__;\n";
+} elsif ($ARGV[2] eq 'r') {
+    print "EXT__;\n";
+}
+
+foreach my $line (@lines) {
+    print $line . "\n";
+}
+
+if ($code == 0) {
+    print "int main(void) {\n";
+    print "    void *RET__ = a($ARGV[1]);\n";
+    print "    if (OUTPUT == INT__) \n";
+    print "        printf(\"%d\\n\", (int) RET__);\n";
+    print "    else if (OUTPUT == CHR__) \n";
+    print "        printf(\"%c\\n\", (char) RET__);\n";
+    print "    else if (OUTPUT == STR__) \n";
+    print "        printf(\"%s\\n\", (char *) RET__);\n";
+    print "    else if (OUTPUT == EXT__)\n";
+    print "        return (int) RET__;\n";
+    print "    return 0;\n";
+    print "}";
+}
