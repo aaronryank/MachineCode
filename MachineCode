@@ -21,6 +21,10 @@ my $ot;
 my $ov;
 
 if (!length(@lines[2] // '')) {
+    @lines[2] = $ARGV[1];
+}
+
+if (!length(@lines[2] // '')) {
     $ot = "NONE";
     $ov = "void *";
 } elsif (@lines[2] eq 'p') {
