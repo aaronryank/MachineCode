@@ -48,7 +48,7 @@ foreach my $line (@lines) {
 }
 
 if ($code == 0) {
-    print "int main(void) {\n";
+    print "int main(int C, char **A) {\n";
     print "    void *RET__ = a($ARGV[1]);\n";
     print "    if (OUTPUT == INT__) \n";
     print "        printf(\"%d\\n\", (int) RET__);\n";
