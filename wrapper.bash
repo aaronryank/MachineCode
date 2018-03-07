@@ -7,3 +7,4 @@ bin="$(mktemp ./tmpXXXXX)"
 "$mcc" "$1" "$(cat)" "${@:2}" > "$src"
 gcc -w -o "$bin" "$src"
 "$bin"
+
