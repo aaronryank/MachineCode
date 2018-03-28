@@ -8,3 +8,4 @@ bin="$(mktemp ./tmpXXXXX)"
 gcc -w -o "$bin" "$src"
 "$bin"
 
+rm "$src" "$bin"
